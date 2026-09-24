@@ -1,6 +1,35 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Match the document language to the user's device/browser settings
+    document.documentElement.lang = navigator.language || 'en';
+
+    const startInput = document.getElementById('gc-start');
+    const endInput = document.getElementById('gc-end');
     const submitBtn = document.getElementById('gc-submit-btn');
-    
+
+    // Handle start time changes (sets minimum end time and defaults to 1 hour duration)
+    if (startInput && endInput) {
+        startInput.addEventListener('change', () => {
+            const startVal = startInput.value;
+            if (!startVal) return;
+
+            // Restrict end time from being before the start time
+            endInput.min = startVal;
+
+            // Automatically set end time to 1 hour after the start time
+            const startDate = new Date(startVal);
+            startDate.setHours(startDate.getHours() + 1);
+
+            const pad = (n) => String(n).padStart(2, '0');
+            const year = startDate.getFullYear();
+            const month = pad(startDate.getMonth() + 1);
+            const day = pad(startDate.getDate());
+            const hours = pad(startDate.getHours());
+            const minutes = pad(startDate.getMinutes());
+
+            endInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+        });
+    }
+
     if (submitBtn) {
         submitBtn.addEventListener('click', generateGoogleCalendarLink);
     }
@@ -22,7 +51,13 @@ function generateGoogleCalendarLink() {
         return;
     }
 
-    // Helper to format "YYYY-MM-DDTHH:MM" to Google's "YYYYMMDDTHHMM00"
+    // Safety validation check
+    if (new Date(endVal) < new Date(startVal)) {
+        alert('The end time cannot be earlier than the start time.');
+        return;
+    }
+
+    // Format datetime strings to Google's required scheme (YYYYMMDDTHHMM00)
     const formatDateTime = (dtStr) => {
         return dtStr.replace(/[-:]/g, '') + '00';
     };
@@ -31,10 +66,8 @@ function generateGoogleCalendarLink() {
     const endFormatted = formatDateTime(endVal);
     const datesParam = `${startFormatted}/${endFormatted}`;
 
-    // Build Google Calendar URL
     const baseUrl = 'https://calendar.google.com/calendar/render';
     const url = `${baseUrl}?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${datesParam}&details=${encodeURIComponent(details)}`;
 
-    // Open in a new tab
     window.open(url, '_blank');
 }
