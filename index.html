@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Calendar Event Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="gc-generator-card">
+        <h3>Add to Google Calendar</h3>
+        
+        <div class="gc-form-group">
+            <label for="gc-title">Event Title</label>
+            <input type="text" id="gc-title" placeholder="Meeting, Workshop, etc.">
+        </div>
+        
+        <div class="gc-form-group">
+            <label for="gc-start">Start Date & Time</label>
+            <input type="datetime-local" id="gc-start">
+        </div>
+        
+        <div class="gc-form-group">
+            <label for="gc-end">End Date & Time</label>
+            <input type="datetime-local" id="gc-end">
+        </div>
+        
+        <div class="gc-form-group">
+            <label for="gc-details">Description (Optional)</label>
+            <textarea id="gc-details" rows="3" placeholder="Add some notes..."></textarea>
+        </div>
+        
+        <button id="gc-submit-btn">Add to Google Calendar</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
