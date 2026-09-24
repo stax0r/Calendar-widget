@@ -1,21 +1,64 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Match the document language to the user's device/browser settings
-    document.documentElement.lang = navigator.language || 'en';
+// Translation dictionary
+const translations = {
+    en: {
+        cardTitle: "Add to Google Calendar",
+        labelTitle: "Event Title",
+        placeholderTitle: "Meeting, Workshop, etc.",
+        labelStart: "Start Date & Time",
+        labelEnd: "End Date & Time",
+        labelDetails: "Description (Optional)",
+        placeholderDetails: "Add some notes...",
+        submitBtn: "Add to Google Calendar",
+        alertFill: "Please fill in the title, start time, and end time.",
+        alertValidation: "The end time cannot be earlier than the start time."
+    },
+    pt: {
+        cardTitle: "Adicionar ao Google Agenda",
+        labelTitle: "Título do Evento",
+        placeholderTitle: "Reunião, Workshop, etc.",
+        labelStart: "Data e Hora de Início",
+        labelEnd: "Data e Hora de Término",
+        labelDetails: "Descrição (Opcional)",
+        placeholderDetails: "Adicione algumas notas...",
+        submitBtn: "Adicionar ao Google Agenda",
+        alertFill: "Por favor, preencha o título, o horário de início e o horário de término.",
+        alertValidation: "O horário de término não pode ser anterior ao horário de início."
+    }
+};
 
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Detect device language (default to 'en' if not Portuguese)
+    const userLang = navigator.language || navigator.userLanguage || 'en';
+    const langKey = userLang.toLowerCase().startsWith('pt') ? 'pt' : 'en';
+    const t = translations[langKey];
+
+    // Set document lang attribute
+    document.documentElement.lang = langKey;
+
+    // 2. Apply translations to elements
+    document.getElementById('gc-card-title').textContent = t.cardTitle;
+    document.getElementById('gc-label-title').textContent = t.labelTitle;
+    document.getElementById('gc-title').placeholder = t.placeholderTitle;
+    document.getElementById('gc-label-start').textContent = t.labelStart;
+    document.getElementById('gc-label-end').textContent = t.labelEnd;
+    document.getElementById('gc-label-details').textContent = t.labelDetails;
+    document.getElementById('gc-details').placeholder = t.placeholderDetails;
+    document.getElementById('gc-submit-btn').textContent = t.submitBtn;
+
+    // 3. Time input logic & validation
     const startInput = document.getElementById('gc-start');
     const endInput = document.getElementById('gc-end');
     const submitBtn = document.getElementById('gc-submit-btn');
 
-    // Handle start time changes (sets minimum end time and defaults to 1 hour duration)
     if (startInput && endInput) {
         startInput.addEventListener('change', () => {
             const startVal = startInput.value;
             if (!startVal) return;
 
-            // Restrict end time from being before the start time
+            // Prevent end time from being before start time
             endInput.min = startVal;
 
-            // Automatically set end time to 1 hour after the start time
+            // Default duration: 1 hour ahead
             const startDate = new Date(startVal);
             startDate.setHours(startDate.getHours() + 1);
 
@@ -31,11 +74,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (submitBtn) {
-        submitBtn.addEventListener('click', generateGoogleCalendarLink);
+        submitBtn.addEventListener('click', () => generateGoogleCalendarLink(t));
     }
 });
 
-function generateGoogleCalendarLink() {
+function generateGoogleCalendarLink(t) {
     const titleInput = document.getElementById('gc-title');
     const startInput = document.getElementById('gc-start');
     const endInput = document.getElementById('gc-end');
@@ -47,13 +90,12 @@ function generateGoogleCalendarLink() {
     const details = detailsInput ? detailsInput.value.trim() : '';
 
     if (!title || !startVal || !endVal) {
-        alert('Please fill in the title, start time, and end time.');
+        alert(t.alertFill);
         return;
     }
 
-    // Safety validation check
     if (new Date(endVal) < new Date(startVal)) {
-        alert('The end time cannot be earlier than the start time.');
+        alert(t.alertValidation);
         return;
     }
 
